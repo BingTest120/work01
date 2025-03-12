@@ -10,19 +10,23 @@ public class QuizUI : MonoBehaviour
 
     public GameObject quizArea;
     public GameObject quizResultArea;
+    public GameObject confirmChoiceArea;
 
     public TextMeshProUGUI questionText;
     public TextMeshProUGUI[] choiceTexts;
     public TextMeshProUGUI score1;
     public TextMeshProUGUI score2;
+    public TextMeshProUGUI score3;
 
     public Image[] chooseImg;
-
     public Button[] choiceButtons;
-    public Button nextChoice;
-    public Button previousChoice;
+    public GameObject nextChoice;
+    public GameObject previousChoice;
+
 
     private int currentQuestionIndex = 0;
+    private List<int> selectedChoices = new List<int>();
+    private List<int> correctScores = new List<int>();
 
     void Start()
     {
@@ -30,6 +34,7 @@ public class QuizUI : MonoBehaviour
         DisplayQuestion(currentQuestionIndex);
 
         previousChoice.gameObject.SetActive(false);
+        nextChoice.SetActive(false);
     }
 
     void DisplayQuestion(int index)
@@ -37,9 +42,8 @@ public class QuizUI : MonoBehaviour
         if (quizManager == null || index < 0 || index >= quizManager.questions.Count) return;
 
         QuizQuestion question = quizManager.questions[index];
-        questionText.text = question.question; // แสดงคำถาม
+        questionText.text = question.question;
 
-        // กำหนดตัวเลือกให้กับคำถาม
         for (int i = 0; i < choiceTexts.Length; i++)
         {
             choiceTexts[i].text = question.choices[i];
@@ -47,34 +51,63 @@ public class QuizUI : MonoBehaviour
 
         previousChoice.gameObject.SetActive(index > 0);
 
-        // เรียกฟังก์ชัน SelectChoice ให้เป็นค่าเริ่มต้น (ตัวเลือกที่ยังไม่ได้เลือก)
-        SelectChoice(-1); // หรือค่าอื่นที่ไม่ตรงกับตัวเลือก
+        int selectedIndex = -1;
+        if (selectedChoices.Count > index)
+        {
+            selectedIndex = selectedChoices[index];
+        }
+
+        SelectChoice(selectedIndex);
     }
-
-
 
     void SelectChoice(int index)
     {
-        // ซ่อนรูปทั้งหมดก่อน
         foreach (var img in chooseImg)
         {
             img.gameObject.SetActive(false);
         }
 
-        // แสดงรูปเฉพาะที่เลือก
         if (index >= 0 && index < chooseImg.Length)
         {
             chooseImg[index].gameObject.SetActive(true);
+            nextChoice.SetActive(true);
+        }
+        else
+        {
+            nextChoice.SetActive(false);
         }
     }
 
-
     public void OnChoiceSelected(int index)
     {
+        if (selectedChoices.Count <= currentQuestionIndex)
+        {
+            selectedChoices.Add(index);
+        }
+        else
+        {
+            selectedChoices[currentQuestionIndex] = index;
+        }
+
+        int score = CheckAnswer(index);
+        if (correctScores.Count <= currentQuestionIndex)
+        {
+            correctScores.Add(score);
+        }
+        else
+        {
+            correctScores[currentQuestionIndex] = score;
+        }
+
         SelectChoice(index);
     }
 
+    int CheckAnswer(int selectedIndex)
+    {
+        QuizQuestion question = quizManager.questions[currentQuestionIndex];
 
+        return selectedIndex == question.correctAnswerIndex ? 1 : 0;
+    }
 
     public void NextQuestion()
     {
@@ -82,6 +115,10 @@ public class QuizUI : MonoBehaviour
         {
             currentQuestionIndex++;
             DisplayQuestion(currentQuestionIndex);
+        }
+        else
+        {
+            confirmChoiceArea.SetActive(true);
         }
     }
 
@@ -94,4 +131,24 @@ public class QuizUI : MonoBehaviour
         }
     }
 
+    public void confirmChoice()
+    {
+        int totalScore = 0;
+        foreach (int score in correctScores)
+        {
+            totalScore += score;
+        }
+
+        score1.text = "ทำได้ทั้งหมด " + totalScore.ToString() + " ข้อ";
+        score2.text = totalScore.ToString();
+        score3.text = "จากแบบทดสอบทั้งหมด " + quizManager.questions.Count.ToString() + " ข้อ";
+
+        quizArea.SetActive(false);
+        quizResultArea.SetActive(true);
+    }
+
+    public void backQuiz()
+    {
+        confirmChoiceArea.SetActive(false);
+    }
 }
