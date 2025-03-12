@@ -14,19 +14,6 @@ public class QuizManager : MonoBehaviour
 
     void LoadQuestions()
     {
-        //ข้อ 2 ()
-        questions.Add(new QuizQuestion
-        {
-            question = "1. ภายหลังจากที่มีการประเมินผลงานไปแล้วจำเป็นต้องมีการแจ้งผลการประเมินนั้นหรือไม่",
-            choices = new string[] { 
-            "ไม่จำเป็นเพราะเป็นการเสียเวลา", 
-            "จำเป็นเพราะเปิดโอกาสให้ทุกฝ่ายทราบผลและนำไปปรับปรุง", 
-            "ไม่จำเป็นเพราะทุกฝ่ายย่อมทราบพฤติกรรมการทำงานของตนเอง", 
-            "จำเป็นเพราะจัดสรรงบประมาณส่วนนี้ไว้แล้ว" 
-            },
-            correctAnswerIndex = 0 // ก. มาจากการสำรวจความต้องการของสมาชิกส่วนใหญ่
-        });
-
         //ข้อ 1 (2)
         questions.Add(new QuizQuestion
         {
@@ -40,6 +27,52 @@ public class QuizManager : MonoBehaviour
             correctAnswerIndex = 0 // ก. มาจากการสำรวจความต้องการของสมาชิกส่วนใหญ่
         });
 
+        //ข้อ 2 (4)
+        questions.Add(new QuizQuestion
+        {
+            question = "2. บุคคลที่ทำให้สหกรณ์ประสบความสำเร็จ คือ",
+            choices = new string[] { 
+            "เจ้าหน้าที่สหกรณ์", 
+            "คณะกรรมการ", 
+            "สมาชิก", 
+            "ทุกข้อถูกต้อง" 
+            },
+            correctAnswerIndex = 3 // ง. ทุกข้อถูกต้อง
+        });
+
+        //ข้อ 3 (5)
+        questions.Add(new QuizQuestion
+        {
+            question = "3. ภารกิจหลักของสหกรณ์ คือ",
+            choices = new string[] { 
+            "พัฒนาคุณภาพชีวิตสมาชิก", 
+            "พัฒนาอาชีพสมาชิก", 
+            "วางนโยบายเพื่อแก้ปัญหาให้สมาชิก", 
+            "ถูกทุกข้อ" 
+            },
+            correctAnswerIndex = 3 // ง.ถูกทุกข้อ
+        });
+
+
+
+
+     /*ตัวอย่าง
+
+        //ข้อ 1 ()
+        questions.Add(new QuizQuestion
+        {
+            question = "",
+            choices = new string[] { 
+            "", 
+            "", 
+            "", 
+            "" 
+            },
+            correctAnswerIndex = 0 // ก. มาจากการสำรวจความต้องการของสมาชิกส่วนใหญ่
+        });
+
+    */
+
         
     }
 
@@ -48,11 +81,5 @@ public class QuizManager : MonoBehaviour
         if (index < 0 || index >= questions.Count) return;
 
         QuizQuestion q = questions[index];
-
-        Debug.Log("คำถาม: " + q.question);
-        for (int i = 0; i < q.choices.Length; i++)
-        {
-            Debug.Log(q.choices[i]);
-        }
     }
 }
