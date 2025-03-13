@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine.SceneManagement;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
@@ -7,10 +8,14 @@ using TMPro;
 public class QuizUI : MonoBehaviour
 {
     private QuizManager quizManager;
+    private SoundManager soundManager;
+
 
     public GameObject quizArea;
     public GameObject quizResultArea;
     public GameObject confirmChoiceArea;
+    public GameObject resultChoiceArea;
+    public GameObject wrongChoiceArea;
 
     public TextMeshProUGUI questionText;
     public TextMeshProUGUI[] choiceTexts;
@@ -18,6 +23,8 @@ public class QuizUI : MonoBehaviour
     public TextMeshProUGUI score1;
     public TextMeshProUGUI score2;
     public TextMeshProUGUI score3;
+    public TextMeshProUGUI backHome;
+    public TextMeshProUGUI answersWrong;
 
     public Image[] chooseImg;
     public Button[] choiceButtons;
@@ -25,6 +32,7 @@ public class QuizUI : MonoBehaviour
     public GameObject previousChoice;
 
 
+    private int totalScore = 0;
     private int currentQuestionIndex = 0;
     private List<int> selectedChoices = new List<int>();
     private List<int> correctScores = new List<int>();
@@ -33,6 +41,7 @@ public class QuizUI : MonoBehaviour
     {
         userName();
 
+        soundManager = FindObjectOfType<SoundManager>();
         quizManager = FindObjectOfType<QuizManager>();
         DisplayQuestion(currentQuestionIndex);
 
@@ -83,6 +92,8 @@ public class QuizUI : MonoBehaviour
 
     public void OnChoiceSelected(int index)
     {
+        soundManager.soundButton();
+
         if (selectedChoices.Count <= currentQuestionIndex)
         {
             selectedChoices.Add(index);
@@ -114,6 +125,8 @@ public class QuizUI : MonoBehaviour
 
     public void NextQuestion()
     {
+        soundManager.soundClick();
+
         if (currentQuestionIndex < quizManager.questions.Count - 1)
         {
             currentQuestionIndex++;
@@ -127,6 +140,7 @@ public class QuizUI : MonoBehaviour
 
     public void PreviousQuestion()
     {
+        soundManager.soundClick();
         if (currentQuestionIndex > 0)
         {
             currentQuestionIndex--;
@@ -136,10 +150,28 @@ public class QuizUI : MonoBehaviour
 
     public void confirmChoice()
     {
-        int totalScore = 0;
-        foreach (int score in correctScores)
+        soundManager.soundQuizResul();
+
+        totalScore = 0;
+        List<int> wrongAnswers = new List<int>(); 
+
+        for (int i = 0; i < correctScores.Count; i++)
         {
-            totalScore += score;
+            totalScore += correctScores[i];
+
+            if (correctScores[i] == 0) 
+            {
+                wrongAnswers.Add(i + 1); 
+            }
+        }
+
+        if (wrongAnswers.Count > 0)
+        {
+            answersWrong.text = "ข้อ " + string.Join(", ", wrongAnswers);
+        }
+        else
+        {
+            backHome.text = "หน้าหลัก";
         }
 
         score1.text = "ทำได้ทั้งหมด " + totalScore.ToString() + " ข้อ";
@@ -150,10 +182,47 @@ public class QuizUI : MonoBehaviour
         quizResultArea.SetActive(true);
     }
 
+    public void wrongChoice()
+    {
+        if(totalScore == quizManager.questions.Count)
+        {
+            soundManager.soundButton();
+            Debug.Log("คุณตอบถูกทุกข้อ!");
+            Invoke("LoadScene", 0.5f);
+        }
+        else
+        {
+            soundManager.soundButton();
+            resultChoiceArea.SetActive(false);
+            wrongChoiceArea.SetActive(true);
+        }
+    }
+
+    public void backLogin()
+    {
+        soundManager.soundButton();
+        Invoke("LoadScene", 0.5f);
+    }
+
+    private void LoadScene()
+    {
+        SceneManager.LoadScene("login");
+    }
+
+
     public void backQuiz()
     {
+        soundManager.soundCancel();
         confirmChoiceArea.SetActive(false);
     }
+
+    public void backQuizResul()
+    {
+        soundManager.soundQuizResul();
+        wrongChoiceArea.SetActive(false);
+        resultChoiceArea.SetActive(true);
+    }
+
 
     public void userName()
     {

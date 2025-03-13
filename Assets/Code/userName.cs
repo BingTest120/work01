@@ -9,6 +9,12 @@ public class userName : MonoBehaviour
 {
     public TMP_InputField firstNameInput;
     public TMP_InputField lastNameInput;
+    private SoundManager soundManager;
+
+    void Start()
+    {
+        soundManager = FindObjectOfType<SoundManager>();
+    }
 
     public void OnConfirm()
     {
@@ -20,17 +26,26 @@ public class userName : MonoBehaviour
             PlayerPrefs.SetString("FirstName", firstName);
             PlayerPrefs.SetString("LastName", lastName);
             PlayerPrefs.Save();
+            
+            soundManager.soundQuizResul();
 
-            SceneManager.LoadScene("gamePlay");
+            Invoke("LoadScene", 0.5f);
         }
         else
         {
-            Debug.Log("กรุณากรอกชื่อและนามสกุลให้ครบ");
+            soundManager.soundCancel();
         }
+    }
+
+    private void LoadScene()
+    {
+        SceneManager.LoadScene("gamePlay");
     }
 
     public void OnCancel()
     {
+        soundManager.soundCancel();
+        
         firstNameInput.text = "";
         lastNameInput.text = "";
     }
