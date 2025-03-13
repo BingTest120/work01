@@ -14,6 +14,7 @@ public class QuizUI : MonoBehaviour
 
     public TextMeshProUGUI questionText;
     public TextMeshProUGUI[] choiceTexts;
+    public TextMeshProUGUI nameUser;
     public TextMeshProUGUI score1;
     public TextMeshProUGUI score2;
     public TextMeshProUGUI score3;
@@ -30,6 +31,8 @@ public class QuizUI : MonoBehaviour
 
     void Start()
     {
+        userName();
+
         quizManager = FindObjectOfType<QuizManager>();
         DisplayQuestion(currentQuestionIndex);
 
@@ -150,5 +153,20 @@ public class QuizUI : MonoBehaviour
     public void backQuiz()
     {
         confirmChoiceArea.SetActive(false);
+    }
+
+    public void userName()
+    {
+        string firstName = PlayerPrefs.GetString("FirstName", "");
+        string lastName = PlayerPrefs.GetString("LastName", "");
+
+        if (!string.IsNullOrEmpty(firstName) && !string.IsNullOrEmpty(lastName))
+        {
+            nameUser.text = $"{firstName} {lastName}";
+        }
+        else
+        {
+            nameUser.text = "(ยังไม่มีข้อมูล)";
+        }
     }
 }
