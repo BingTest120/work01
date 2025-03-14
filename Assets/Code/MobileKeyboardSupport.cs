@@ -2,36 +2,35 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-public class MobileKeyboardSupport : MonoBehaviour, IPointerClickHandler
+public class MobileKeyboardSupport : MonoBehaviour, IPointerDownHandler
 {
     public TMP_InputField firstNameInput;
     public TMP_InputField lastNameInput;
+    private TouchScreenKeyboard keyboard;
 
-    void Start()
+    private void Start()
     {
-        if (firstNameInput == null)
+        firstNameInput.onSelect.AddListener(OpenKeyboard);
+        lastNameInput.onSelect.AddListener(OpenKeyboard);
+    }
+
+    private void OpenKeyboard(string text)
+    {
+        if (TouchScreenKeyboard.isSupported) 
         {
-            firstNameInput = GetComponent<TMP_InputField>();
-        }
-        if (lastNameInput == null)
-        {
-            lastNameInput = GetComponent<TMP_InputField>();
+            keyboard = TouchScreenKeyboard.Open(text, TouchScreenKeyboardType.Default);
         }
     }
 
-    public void OnPointerClick(PointerEventData eventData)
+    public void OnPointerDown(PointerEventData eventData)
     {
-        #if UNITY_WEBGL && !UNITY_EDITOR
-            if (eventData.selectedObject == firstNameInput.gameObject)
-            {
-                firstNameInput.DeactivateInputField();
-                firstNameInput.ActivateInputField();
-            }
-            else if (eventData.selectedObject == lastNameInput.gameObject)
-            {
-                lastNameInput.DeactivateInputField();
-                lastNameInput.ActivateInputField();
-            }
-        #endif
+        if (EventSystem.current.currentSelectedGameObject == firstNameInput.gameObject)
+        {
+            OpenKeyboard(firstNameInput.text);
+        }
+        else if (EventSystem.current.currentSelectedGameObject == lastNameInput.gameObject)
+        {
+            OpenKeyboard(lastNameInput.text);
+        }
     }
 }
