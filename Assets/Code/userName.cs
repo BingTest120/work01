@@ -10,10 +10,38 @@ public class userName : MonoBehaviour
     public TMP_InputField firstNameInput;
     public TMP_InputField lastNameInput;
     private SoundManager soundManager;
+    private TouchScreenKeyboard keyboard;
 
     void Start()
     {
         soundManager = FindObjectOfType<SoundManager>();
+
+        // เชื่อมโยงกับ onSelect listener เพื่อเปิดคีย์บอร์ด
+        firstNameInput.onSelect.AddListener(OpenKeyboard);
+        lastNameInput.onSelect.AddListener(OpenKeyboard);
+    }
+
+    private void OpenKeyboard(string text)
+    {
+        if (TouchScreenKeyboard.isSupported) 
+        {
+            keyboard = TouchScreenKeyboard.Open(text, TouchScreenKeyboardType.Default);
+        }
+    }
+
+    void Update()
+    {
+        if (keyboard != null && keyboard.active)
+        {
+            if (firstNameInput.isFocused)
+            {
+                firstNameInput.text = keyboard.text; 
+            }
+            else if (lastNameInput.isFocused)
+            {
+                lastNameInput.text = keyboard.text;
+            }
+        }
     }
 
     public void OnConfirm()
@@ -28,7 +56,6 @@ public class userName : MonoBehaviour
             PlayerPrefs.Save();
             
             soundManager.soundQuizResul();
-
             Invoke("LoadScene", 0.5f);
         }
         else
